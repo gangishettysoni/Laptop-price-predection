@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SmartTech Co. - Laptop Price Predictor</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🖥️ SmartTech Co.</h1>
+            <h2>Laptop Price Prediction System</h2>
+            <p class="subtitle">AI-Powered Real-Time Price Estimation • Indian Market Prices</p>
+        </header>
+
+        <div class="model-info">
+            <h3>📊 Model Performance</h3>
+            <div class="metrics">
+                <div class="metric">
+                    <span class="metric-label">Model</span>
+                    <span class="metric-value">{{ model_info.model_name }}</span>
+                </div>
+                <div class="metric">
+                    <span class="metric-label">Accuracy (R²)</span>
+                    <span class="metric-value">{{ "%.2f"|format(model_info.test_r2 * 100) }}%</span>
+                </div>
+                <div class="metric">
+                    <span class="metric-label">Avg Error</span>
+                    <span class="metric-value">₹{{ "{:,.0f}".format(model_info.mae) }}</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <div class="form-section">
+                <h3>Enter Laptop Specifications</h3>
+                <form id="predictionForm">
+                    <div class="form-grid">
+
+                        <div class="form-group">
+                            <label for="brand">Brand *</label>
+                            <select id="brand" name="brand" required>
+                                <option value="">Select Brand</option>
+                                {% for brand in brands %}
+                                <option value="{{ brand }}">{{ brand }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="processor">Processor *</label>
+                            <select id="processor" name="processor" required>
+                                <option value="">Select Processor</option>
+                                {% for processor in processors %}
+                                <option value="{{ processor }}">{{ processor }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="generation">Generation *</label>
+                            <select id="generation" name="generation" required>
+                                <option value="">Select Processor First</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="ram">RAM (GB) *</label>
+                            <select id="ram" name="ram" required>
+                                <option value="">Select RAM</option>
+                                <option value="4">4 GB</option>
+                                <option value="8">8 GB</option>
+                                <option value="16">16 GB</option>
+                                <option value="32">32 GB</option>
+                                <option value="64">64 GB</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="storage_type">Storage Type *</label>
+                            <select id="storage_type" name="storage_type" required>
+                                <option value="">Select Type</option>
+                                {% for storage_type in storage_types %}
+                                <option value="{{ storage_type }}">{{ storage_type }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="storage">Storage Size *</label>
+                            <select id="storage" name="storage" required>
+                                <option value="">Select Storage</option>
+                                <option value="256">256 GB</option>
+                                <option value="512">512 GB</option>
+                                <option value="1024">1 TB</option>
+                                <option value="2048">2 TB</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="screen_size">Screen Size *</label>
+                            <select id="screen_size" name="screen_size" required>
+                                <option value="">Select Size</option>
+                                <option value="13.3">13.3"</option>
+                                <option value="14.0">14.0"</option>
+                                <option value="15.6">15.6"</option>
+                                <option value="17.3">17.3"</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="gpu">Graphics Card *</label>
+                            <select id="gpu" name="gpu" required>
+                                <option value="">Select GPU</option>
+                                {% for gpu in gpus %}
+                                <option value="{{ gpu }}">{{ gpu }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="os">Operating System *</label>
+                            <select id="os" name="os" required>
+                                <option value="">Select OS</option>
+                                {% for os in os_types %}
+                                <option value="{{ os }}">{{ os }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="weight">Weight (kg) *</label>
+                            <select id="weight" name="weight" required>
+                                <option value="">Select Weight</option>
+                                <option value="1.2">1.2 kg</option>
+                                <option value="1.5">1.5 kg</option>
+                                <option value="1.8">1.8 kg</option>
+                                <option value="2.0">2.0 kg</option>
+                                <option value="2.3">2.3 kg</option>
+                                <option value="2.5">2.5 kg</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="touchscreen">Touchscreen *</label>
+                            <select id="touchscreen" name="touchscreen" required>
+                                <option value="">Select Option</option>
+                                <option value="0">No</option>
+                                <option value="1">Yes</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="warranty">Warranty (Years) *</label>
+                            <select id="warranty" name="warranty" required>
+                                <option value="">Select Warranty</option>
+                                <option value="1">1 Year</option>
+                                <option value="2">2 Years</option>
+                                <option value="3">3 Years</option>
+                            </select>
+                        </div>
+
+                    </div>
+                    <button type="submit" class="btn-predict">🔮 Predict Price</button>
+                </form>
+            </div>
+
+            <div class="result-section" id="resultSection" style="display: none;">
+                <h3>💰 Predicted Price</h3>
+                <div class="currency-toggle">
+                    <button id="btnINR" class="currency-btn active" onclick="switchCurrency('INR')">🇮🇳 INR (₹)</button>
+                    <button id="btnUSD" class="currency-btn" onclick="switchCurrency('USD')">🇺🇸 USD ($)</button>
+                </div>
+                <div class="price-display">
+                    <div class="main-price" id="mainPrice">₹0</div>
+                    <div class="price-range" id="priceRange">Range: ₹0 - ₹0</div>
+                </div>
+                <div class="specs-summary">
+                    <h4>📋 Specifications Summary</h4>
+                    <div id="specsSummary"></div>
+                </div>
+            </div>
+        </div>
+
+        <footer>
+            <p>© SmartTech Co. | Powered by Random Forest ML</p>
+            <p class="disclaimer">Prices based on Indian market data • Exchange rate: ₹83.5 = $1</p>
+        </footer>
+    </div>
+
+    <script>
+        let priceData = {};
+
+        // Dynamically load generations when processor changes
+        document.getElementById('processor').addEventListener('change', async function () {
+            const processor = this.value;
+            const genSelect = document.getElementById('generation');
+            genSelect.innerHTML = '<option value="">Loading...</option>';
+
+            if (!processor) {
+                genSelect.innerHTML = '<option value="">Select Processor First</option>';
+                return;
+            }
+
+            const res = await fetch(`/generations/${encodeURIComponent(processor)}`);
+            const gens = await res.json();
+            genSelect.innerHTML = '<option value="">Select Generation</option>';
+            gens.forEach(g => {
+                genSelect.innerHTML += `<option value="${g}">${g}</option>`;
+            });
+        });
+
+        function switchCurrency(currency) {
+            document.getElementById('btnINR').classList.toggle('active', currency === 'INR');
+            document.getElementById('btnUSD').classList.toggle('active', currency === 'USD');
+            if (currency === 'INR') {
+                document.getElementById('mainPrice').textContent = `₹${priceData.inr.toLocaleString('en-IN')}`;
+                document.getElementById('priceRange').textContent =
+                    `Range: ₹${priceData.inr_min.toLocaleString('en-IN')} – ₹${priceData.inr_max.toLocaleString('en-IN')}`;
+            } else {
+                document.getElementById('mainPrice').textContent = `$${priceData.usd.toFixed(2)}`;
+                document.getElementById('priceRange').textContent =
+                    `Range: $${priceData.usd_min.toFixed(2)} – $${priceData.usd_max.toFixed(2)}`;
+            }
+        }
+
+        document.getElementById('predictionForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = document.querySelector('.btn-predict');
+            btn.textContent = '⏳ Predicting...';
+            btn.disabled = true;
+
+            const formData = {
+                brand: document.getElementById('brand').value,
+                processor: document.getElementById('processor').value,
+                generation: document.getElementById('generation').value,
+                ram: document.getElementById('ram').value,
+                storage_type: document.getElementById('storage_type').value,
+                storage: document.getElementById('storage').value,
+                screen_size: document.getElementById('screen_size').value,
+                gpu: document.getElementById('gpu').value,
+                os: document.getElementById('os').value,
+                weight: document.getElementById('weight').value,
+                touchscreen: document.getElementById('touchscreen').value,
+                warranty: document.getElementById('warranty').value
+            };
+
+            try {
+                const response = await fetch('/predict', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(formData)
+                });
+                const result = await response.json();
+
+                if (result.success) {
+                    priceData = {
+                        inr: result.price_inr,
+                        usd: result.price_usd,
+                        inr_min: result.range_inr.min,
+                        inr_max: result.range_inr.max,
+                        usd_min: result.range_usd.min,
+                        usd_max: result.range_usd.max
+                    };
+
+                    switchCurrency('INR');
+
+                    let specsHTML = '<ul>';
+                    for (const [key, value] of Object.entries(result.specifications)) {
+                        specsHTML += `<li><strong>${key}:</strong> ${value}</li>`;
+                    }
+                    specsHTML += '</ul>';
+                    document.getElementById('specsSummary').innerHTML = specsHTML;
+
+                    document.getElementById('resultSection').style.display = 'block';
+                    document.getElementById('resultSection').scrollIntoView({ behavior: 'smooth' });
+                } else {
+                    alert('Error: ' + result.error);
+                }
+            } catch (err) {
+                alert('Error: ' + err.message);
+            } finally {
+                btn.textContent = '🔮 Predict Price';
+                btn.disabled = false;
+            }
+        });
+    </script>
+</body>
+</html>
